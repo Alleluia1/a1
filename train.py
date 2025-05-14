@@ -3,6 +3,7 @@ import wandb
 import torch
 from ultralytics import YOLO
 
+wandb.login(key='f8cb8b13b090d70eb2b9b5ee36da161979b90a95')
 wandb.init(
     project='a1',
     name=time.strftime("%Y-%m-%d_%H-%M-%S"),
