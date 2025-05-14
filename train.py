@@ -20,7 +20,7 @@ if __name__ == '__main__':
     model = YOLO('ultralytics/cfg/models/11/yolo11n.yaml')
 
     model.train(
-        data='dataset/data.yaml',
+        data='/root/workspace/d0cv1q7hri0c73e2gq5g/RDD2022_10000/data.yaml',
         cache=False,
         imgsz=640,
         epochs=300,
