@@ -2,14 +2,15 @@ import os
 import time
 import torch
 import wandb
+# ✅ 登录并初始化 wandb
+wandb.login(key="f8cb8b13b090d70eb2b9b5ee36da161979b90a95")
 import warnings
 from ultralytics import YOLO
 
 # ✅ 创建运行名
 run_name = time.strftime("%Y-%m-%d_%H-%M-%S")
 
-# ✅ 登录并初始化 wandb
-wandb.login(key="f8cb8b13b090d70eb2b9b5ee36da161979b90a95")
+
 wandb.init(project="a1", name=run_name)
 
 warnings.filterwarnings('ignore')
@@ -65,4 +66,7 @@ if __name__ == '__main__':
         optimizer='SGD',
         project='runs/train',
         name=run_name,
-        callbacks={"on_fit_epoch_end": on_fit
+        callbacks={"on_fit_epoch_end": on_fit_epoch_end}  # ✅ 自动记录指标
+    )
+
+    log_static_model_info(model)
