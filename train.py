@@ -56,17 +56,18 @@ def log_static_model_info(model):
 if __name__ == '__main__':
     model = YOLO('ultralytics/cfg/models/11/yolo11n.yaml')
     model.train(
-        data='/root/workspace/d0cv1q7hri0c73e2gq5g/RDD2022_10000/data.yaml',
-        cache=False,
-        imgsz=640,
-        epochs=300,
-        batch=32,
-        close_mosaic=0,
-        workers=4,
-        optimizer='SGD',
-        project='runs/train',
-        name=run_name,
-        callbacks={"on_fit_epoch_end": on_fit_epoch_end}  # ✅ 自动记录指标
-    )
+    data='/root/workspace/d0cv1q7hri0c73e2gq5g/RDD2022_10000/data.yaml',
+    cache=False,
+    imgsz=640,
+    epochs=300,
+    batch=32,
+    close_mosaic=0,
+    workers=4,
+    optimizer='SGD',
+    project='runs/train',
+    name=run_name
+    
+)
+
 
     log_static_model_info(model)
