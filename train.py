@@ -2,16 +2,19 @@ import os
 import time
 import torch
 import wandb
-# ✅ 登录并初始化 wandb
-wandb.login(key="f8cb8b13b090d70eb2b9b5ee36da161979b90a95")
 import warnings
 from ultralytics import YOLO
 
-# ✅ 创建运行名
+wandb.login(key="f8cb8b13b090d70eb2b9b5ee36da161979b90a95")
+
+# ✅ 设置终端环境变量，关闭 fancy 进度条
+os.environ["YOLO_TERMINAL"] = "False"
+
+# ✅ 创建唯一 run 名字
 run_name = time.strftime("%Y-%m-%d_%H-%M-%S")
 
-
-wandb.init(project="a1", name=run_name)
+# ✅ 初始化 wandb，关闭控制台打印（避免终端冲突）
+wandb.init(project="a1", name=run_name, settings=wandb.Settings(console="off"))
 
 warnings.filterwarnings('ignore')
 
@@ -27,7 +30,7 @@ def on_fit_epoch_end(trainer):
         'map50-95': metrics.get('metrics/mAP50-95(B)', 0),
     })
 
-# ✅ 训练结束后记录静态模型指标
+# ✅ 训练结束后记录模型静态信息
 def log_static_model_info(model):
     try:
         params = sum(p.numel() for p in model.model.parameters()) / 1e6
@@ -37,6 +40,7 @@ def log_static_model_info(model):
             flops = 0
         weight_path = f'runs/train/{run_name}/weights/best.pt'
         size_mb = os.path.getsize(weight_path) / 1e6 if os.path.exists(weight_path) else 0
+
         dummy = torch.zeros((1, 3, 640, 640)).to(model.device)
         start = time.time()
         model.predict(dummy, verbose=False)
@@ -53,21 +57,22 @@ def log_static_model_info(model):
     except Exception as e:
         print("⚠️ 记录模型信息失败：", e)
 
+# ✅ 开始训练
 if __name__ == '__main__':
     model = YOLO('ultralytics/cfg/models/11/yolo11n.yaml')
-    model.train(
-    data='/root/workspace/d0cv1q7hri0c73e2gq5g/RDD2022_10000/data.yaml',
-    cache=False,
-    imgsz=640,
-    epochs=300,
-    batch=32,
-    close_mosaic=0,
-    workers=4,
-    optimizer='SGD',
-    project='runs/train',
-    name=run_name
-    
-)
 
+    model.train(
+        data='dataset/data.yaml',
+        cache=False,
+        imgsz=640,
+        epochs=300,
+        batch=32,
+        close_mosaic=0,
+        workers=4,
+        optimizer='SGD',
+        project='runs/train',
+        name=run_name,
+        # callbacks=[on_fit_epoch_end],  # ⚠️ 如有自定义 trainer 需显式传 callback
+    )
 
     log_static_model_info(model)
